@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="桂MBTI｜广西人格测试，纯前端单文件网页，无需联网即可打开使用。" />
+<meta name="theme-color" content="#C84B2E" />
+<title>桂MBTI — 广西人格测试</title>
+<style>
+:root {
+  --red: #E76F51;
+  --red-light: #FFF0EC;
+  --red-mid: #F08D73;
+  --green: #2F7D5C;
+  --green-light: #E7F6EF;
+  --gold: #A57C00;
+  --gold-light: #FFF8DB;
+  --ink: #1A1208;
+  --ink2: #3D2E1A;
+  --muted: #8A7A68;
+  --bg: #FBF7F0;
+  --bg2: #F3EDE2;
+  --card: #FFFFFF;
+  --border: rgba(90,60,30,0.12);
+  --li-green: #4F9D69;
+  --river-green: #DDF2E5;
+  --zhuang: #C04848;
+  --sea: #6FA8DC;
+  --powder: #FFE3D9;
+  --serif: "STSong", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC",
+           "SimSun", "PMingLiU", Georgia, serif;
+  --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+          "Source Han Sans SC", "WenQuanYi Micro Hei", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Decorative background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(200,75,46,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(58,107,62,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(184,134,11,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid texture */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Ccircle cx='30' cy='30' r='0.8' fill='%23c84b2e' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SPLASH ── */
+#splash { text-align: center; padding: 3rem 0 2rem; animation: fadeUp 0.6s ease both; }
+
+.splash-deco {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+.deco-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.deco-icon { font-size: 28px; }
+
+.splash-badge {
+  display: inline-block;
+  background: var(--red-light);
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  padding: 5px 16px;
+  border-radius: 30px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(200,75,46,0.2);
+}
+
+#splash h1 {
+  font-family: var(--serif);
+  font-size: clamp(52px, 12vw, 80px);
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 8px;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  text-shadow: 3px 3px 0 rgba(200,75,46,0.12);
+}
+
+.splash-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--muted);
+  letter-spacing: 4px;
+  margin-bottom: 2.5rem;
+}
+
+.splash-desc {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink2);
+  max-width: 480px;
+  margin: 0 auto 2.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+.splash-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-num { font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--red); }
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.start-btn {
+  display: inline-block;
+  background: var(--red);
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--sans);
+  padding: 14px 48px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 20px rgba(200,75,46,0.3);
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(200,75,46,0.38); }
+.start-btn:active { transform: scale(0.97); }
+
+.splash-footer { margin-top: 2rem; font-size: 12px; color: var(--muted); }
+
+/* ── QUIZ ── */
+#quiz { display: none; animation: fadeUp 0.5s ease both; }
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.progress-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.progress-track { flex: 1; height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red-mid), var(--red));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.progress-pct { font-size: 13px; font-weight: 500; color: var(--red); white-space: nowrap; min-width: 40px; text-align: right; }
+
+.dim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.dim-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+.q-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 16px rgba(90,60,30,0.06);
+}
+
+.q-scene {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.q-emoji-bg {
+  width: 54px;
+  height: 54px;
+  background: var(--red-light);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.q-meta { flex: 1; }
+.q-num-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 2px; }
+.q-location { font-size: 13px; color: var(--red); font-weight: 500; }
+
+.q-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+
+.opt {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink2);
+  line-height: 1.6;
+  text-align: left;
+  transition: all 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.opt::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--red-light);
+  transition: width 0.25s;
+}
+.opt:hover { border-color: var(--red-mid); color: var(--ink); }
+.opt:hover::before { width: 4px; }
+.opt.selected { border-color: var(--red); background: var(--red-light); color: var(--ink); }
+.opt.selected::before { width: 4px; background: var(--red); }
+.opt-inner { position: relative; z-index: 1; }
+.opt-ab {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--red-light);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.opt.selected .opt-ab { background: var(--red); color: white; }
+
+.nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.25rem;
+}
+.btn-back {
+  padding: 12px 20px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+.btn-back:hover { border-color: var(--muted); color: var(--ink); }
+
+.btn-next,
+.btn-secondary,
+.btn-share {
+  padding: 13px;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--sans);
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.btn-next {
+  flex: 1;
+  background: var(--red);
+  color: white;
+  box-shadow: 0 4px 16px rgba(200,75,46,0.28);
+}
+.btn-next:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(200,75,46,0.38); }
+.btn-next:active:not(:disabled) { transform: scale(0.98); }
+.btn-next:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+.btn-secondary {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--red);
+  color: var(--red);
+}
+.btn-secondary:hover { background: var(--red-light); }
+
+.btn-share {
+  width: 100%;
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(200,75,46,0.28);
+}
+.btn-share:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(200,75,46,0.38); }
+
+/* ── RESULT ── */
+#result { display: none; animation: fadeUp 0.6s ease both; }
+
+.result-hero {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 30px rgba(90,60,30,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.result-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+}
+.result-emoji-big {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+}
+.result-type-code {
+  font-family: var(--serif);
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 4px;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 0 rgba(200,75,46,0.1);
+}
+.result-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.result-eng { font-size: 13px; color: var(--muted); letter-spacing: 2px; margin-bottom: 1.25rem; }
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.rtag {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(200,75,46,0.25);
+  color: var(--red);
+  background: var(--red-light);
+  font-weight: 500;
+}
+
+.result-desc {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--ink2);
+  text-align: left;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.result-famous {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--gold-light);
+  border-left: 3px solid var(--gold);
+  padding: 8px 14px;
+  border-radius: 0 8px 8px 0;
+  text-align: left;
+}
+
+/* Dim bars */
+.dims-section,
+.compat-section,
+.history-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 12px rgba(90,60,30,0.05);
+}
+.dims-title,
+.compat-title,
+.history-title {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  letter-spacing: 2px;
+}
+.dim-row { margin-bottom: 1.2rem; }
+.dim-row:last-child { margin-bottom: 0; }
+.dim-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; gap: 10px; }
+.dim-winner { color: var(--red); font-weight: 600; }
+.dim-track { height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; position: relative; }
+.dim-fill { height: 100%; background: linear-gradient(90deg, var(--red-mid), var(--red)); border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+.compat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.compat-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.compat-label { font-size: 11px; margin-bottom: 4px; }
+.compat-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+.compat-type { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.compat-card.best { border-color: rgba(58,107,62,0.3); background: var(--green-light); }
+.compat-card.best .compat-label { color: var(--green); }
+.compat-card.clash { border-color: rgba(200,75,46,0.2); background: var(--red-light); }
+.compat-card.clash .compat-label { color: var(--red); }
+.compat-card.work { border-color: rgba(184,134,11,0.25); background: var(--gold-light); }
+.compat-card.work .compat-label { color: var(--gold); }
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.notice {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 18px;
+}
+
+.history-content {
+  font-size: 14px;
+  color: var(--ink2);
+  line-height: 1.8;
+}
+.history-empty {
+  color: var(--muted);
+}
+
+.share-card {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 720px;
+  background: linear-gradient(180deg, #fff9f5 0%, #fff 100%);
+  color: var(--ink);
+  border: 1px solid rgba(200,75,46,0.15);
+  padding: 36px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+}
+.share-card .share-head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.share-card .share-title {
+  font-family: var(--serif);
+  font-size: 48px;
+  color: var(--red);
+  letter-spacing: 4px;
+  line-height: 1;
+}
+.share-card .share-sub {
+  font-size: 18px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.share-card .share-body {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px;
+}
+.share-card .share-emoji {
+  font-size: 52px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.share-card .share-code {
+  font-family: var(--serif);
+  text-align: center;
+  font-size: 42px;
+  color: var(--red);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+.share-card .share-name {
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 26px;
+  margin-bottom: 14px;
+}
+.share-card .share-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.share-card .share-tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--red-light);
+  color: var(--red);
+  font-size: 13px;
+  border: 1px solid rgba(200,75,46,0.2);
+}
+.share-card .share-desc {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--ink2);
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 16px;
+}
+.share-card .share-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.name-box,
+.mode-box,
+.hot-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1rem;
+  margin: 0 auto 1rem;
+  max-width: 520px;
+  text-align: left;
+}
+.name-label, .mode-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.name-input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+}
+.name-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(79,157,105,0.12); }
+
+.mode-row,
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mode-chip,
+.quick-chip,
+.small-chip {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--ink2);
+  cursor: pointer;
+  text-align: center;
+}
+.mode-chip.active,
+.quick-chip.active,
+.small-chip.active {
+  border-color: var(--red);
+  background: var(--red-light);
+  color: var(--red);
+  font-weight: 600;
+}
+.splash-mini {
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top: 1rem;
+}
+.mini-tag {
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--river-green);
+  color: var(--green);
+}
+.splash-wave {
+  height: 16px;
+  margin: 1rem auto 0;
+  max-width: 320px;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(231,111,81,0.32) 0 16%, transparent 17%),
+    radial-gradient(circle at 30% 50%, rgba(79,157,105,0.28) 0 16%, transparent 17%),
+    radial-gradient(circle at 50% 50%, rgba(111,168,220,0.28) 0 16%, transparent 17%),
+    radial-gradient(circle at 70% 50%, rgba(231,111,81,0.32) 0 16%, transparent 17%),
+    radial-gradient(circle at 90% 50%, rgba(79,157,105,0.28) 0 16%, transparent 17%);
+  animation: bob 3s ease-in-out infinite;
+}
+.loading-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(251,247,240,0.94);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.loading-card {
+  width: min(88vw, 380px);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.4rem;
+  box-shadow: 0 14px 48px rgba(90,60,30,0.12);
+  text-align: center;
+}
+.loading-boat {
+  font-size: 36px;
+  display: inline-block;
+  animation: boat 1.8s ease-in-out infinite;
+}
+.loading-title {
+  margin-top: 8px;
+  font-family: var(--serif);
+  font-size: 18px;
+}
+.loading-sub {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.loading-bar {
+  margin-top: 14px;
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.loading-bar span {
+  display:block;
+  height:100%;
+  width:45%;
+  background: linear-gradient(90deg, var(--li-green), var(--red));
+  border-radius:999px;
+  animation: loading 1s ease-in-out infinite alternate;
+}
+.quiz-toolbar {
+  display:flex;
+  gap:8px;
+  justify-content:space-between;
+  margin-bottom: 12px;
+  flex-wrap:wrap;
+}
+.quiz-toolbar .left,
+.quiz-toolbar .right { display:flex; gap:8px; flex-wrap:wrap; }
+.toolbar-btn {
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--ink2);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  cursor:pointer;
+}
+.toolbar-btn:hover { border-color: var(--red-mid); }
+
+.question-tip {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.result-kicker {
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  background: var(--red-light);
+  color: var(--red);
+  border:1px solid rgba(231,111,81,0.18);
+  border-radius:999px;
+  padding: 6px 12px;
+  font-size:12px;
+  margin-bottom: 12px;
+}
+.result-region {
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.region-pill,
+.one-line-pill {
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:600;
+}
+.region-pill { background: var(--river-green); color: var(--green); }
+.one-line-pill { background: var(--powder); color: var(--red); }
+.reason-section,
+.rank-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 12px rgba(90,60,30,0.05);
+}
+.reason-list {
+  display:grid;
+  gap:10px;
+}
+.reason-item {
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink2);
+}
+.rank-grid {
+  display:grid;
+  gap:10px;
+}
+.rank-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border: 1px solid var(--border);
+  background:#fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.rank-left { display:flex; align-items:center; gap:10px; }
+.rank-no {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--gold-light); color: var(--gold); font-weight:700; font-size:12px;
+}
+.rank-meta { font-size:13px; color: var(--ink2); }
+.rank-bar {
+  min-width: 84px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg2);
+  overflow:hidden;
+}
+.rank-bar span {
+  display:block;
+  height:100%;
+  background: linear-gradient(90deg, var(--green), var(--red));
+}
+.result-actions .action-grid { margin-top: 2px; }
+.help-txt {
+  color: var(--muted);
+  font-size: 12px;
+  text-align:center;
+  line-height:1.8;
+}
+@keyframes bob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes boat {
+  0%,100% { transform: translateX(-4px) rotate(-2deg); }
+  50% { transform: translateX(4px) rotate(2deg); }
+}
+@keyframes loading {
+  from { width: 20%; }
+  to { width: 82%; }
+}
+
+/* Footer */
+.site-footer {
+  text-align: center;
+  padding: 3rem 0 1rem;
+  font-size: 12px;
+  color: var(--muted);
+}
+.footer-deco { margin-bottom: 0.75rem; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeUp 0.4s ease both; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .wrapper { padding: 1.2rem 0.9rem 2.4rem; }
+  #splash h1 { font-size: 52px; }
+  .q-card { padding: 1.2rem; border-radius: 18px; }
+  .result-hero, .dims-section, .compat-section, .history-section, .reason-section, .rank-section { padding: 1.2rem; border-radius: 18px; }
+  .compat-grid, .mode-row, .action-grid { grid-template-columns: 1fr; }
+  .result-type-code { font-size: 44px; }
+  .btn-next, .btn-back, .btn-share, .btn-secondary { min-height: 48px; }
+  .progress-header { gap: 8px; }
+}
+
+@media (max-width: 380px) {
+  .compat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="loading-mask" id="loading-mask"><div class="loading-card"><div class="loading-boat">🛶</div><div class="loading-title" id="loading-title">正在捞取你的广西人格…</div><div class="loading-sub" id="loading-sub">山歌在响，米粉在冒泡，马上出结果。</div><div class="loading-bar"><span></span></div></div></div>
+<div class="wrapper">
+
+  <!-- ═══ SPLASH ═══ -->
+  <div id="splash">
+    <div class="splash-deco">
+      <div class="deco-line"></div>
+      <div class="deco-icon">🌶</div>
+      <div class="deco-line"></div>
+    </div>
+    <div class="splash-badge">广 西 人 格 测 试</div>
+    <h1>桂 MBTI</h1>
+    <div class="splash-sub">你是哪款老表？</div>
+
+    <div class="splash-desc">
+      基于 MBTI 框架，结合广西的螺蛳粉、山歌、壮锦、边境、漓江……<br>
+      16 种原创广西人格，总有一款是你。<br>
+      <span style="color:var(--muted);font-size:13px">不管你是南宁老表还是桂北人，都能找到共鸣。</span>
+    </div>
+
+    <div class="splash-stats">
+      <div class="stat"><div class="stat-num">15</div><div class="stat-label">道情景题</div></div>
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">每题选项</div></div>
+      <div class="stat"><div class="stat-num">16</div><div class="stat-label">广西人格</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">分钟内可做完</div></div>
+    </div>
+
+    <div class="name-box">
+      <div class="name-label">先留个名字，结果会更像“你的专属老表名片”</div>
+      <input id="user-name" class="name-input" type="text" maxlength="12" placeholder="输入昵称，例如：阿俊 / 小李 / 老表" />
+    </div>
+
+    <div class="mode-box">
+      <div class="mode-label">答题模式</div>
+      <div class="mode-row">
+        <button class="mode-chip active" id="mode-normal" onclick="setMode('normal')">标准模式 · 15题</button>
+        <button class="mode-chip" id="mode-fast" onclick="setMode('fast')">快速模式 · 10题</button>
+      </div>
+    </div>
+
+    <div class="hot-box">
+      <div class="mode-label">广西今日热榜</div>
+      <div class="splash-mini">
+        <span class="mini-tag">如何呢又能怎，先嗦粉再讲</span>
+        <span class="mini-tag">助我破鼎版老表：这题我势在必得</span>
+        <span class="mini-tag">广西情绪价值：老友粉、夜市和砂糖橘都给足</span>
+        <span class="mini-tag">来财来财，先测出你的广西人设</span>
+      </div>
+      <div class="splash-wave"></div>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">开始测试</button>
+    <div class="splash-footer">这版四个选项差异拉满：正常派、抽象派、安静派、猎奇派，选最像你的 😄</div>
+  </div>
+
+  <!-- ═══ QUIZ ═══ -->
+  <div id="quiz">
+    <div class="quiz-toolbar">
+      <div class="left">
+        <button class="toolbar-btn" onclick="skipQuestion()">跳过本题</button>
+</div>
+      <div class="right">
+        <button class="toolbar-btn" onclick="setMode(currentMode==='normal'?'fast':'normal', true)">切换快速模式</button>
+      </div>
+    </div>
+    <div class="progress-header">
+      <div class="progress-label" id="q-label">第 1 题</div>
+      <div class="progress-track"><div class="progress-fill" id="p-fill" style="width:0%"></div></div>
+      <div class="progress-pct" id="p-pct">0%</div>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <!-- injected by JS -->
+    </div>
+
+    <div class="nav">
+      <button class="btn-back" id="btn-back" onclick="prev()">← 上一题</button>
+      <button class="btn-next" id="btn-next" onclick="next()" disabled>下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ═══ RESULT ═══ -->
+  <div id="result">
+    <div class="result-hero" id="result-hero"></div>
+    <div class="dims-section" id="dims-section"></div>
+    <div class="compat-section" id="compat-section"></div>
+    <div class="reason-section" id="reason-section"></div>
+    <div class="rank-section" id="rank-section"></div>
+    <div class="history-section" id="history-section"></div>
+
+    <div class="result-actions">
+      <button class="btn-share" onclick="exportShareImage()">🖼 导出结果海报</button>
+      <div class="action-grid">
+        <button class="btn-secondary" onclick="copyResultText()">📋 复制朋友圈文案</button>
+        <button class="btn-secondary" onclick="shareNative()">📲 系统分享</button>
+        <button class="btn-secondary" onclick="restart()">🔄 再测一次</button>
+        <button class="btn-secondary" onclick="restart(true)">🌀 换个角度测</button>
+      </div>
+      <div class="help-txt">支持快速答题、专属昵称、结果复玩和本地保存；这版四个选项差异更大，结果会更有辨识度。</div>
+      <div class="notice" id="notice"></div>
+    </div>
+  </div>
+
+  <div class="site-footer">
+    <div class="footer-deco">🌿 ✦ 🌶</div>
+    桂 MBTI · 广西人格测试 · 仅供娱乐
+  </div>
+</div>
+
+<!-- hidden share card -->
+<div id="share-card" class="share-card" aria-hidden="true"></div>
+
+<script>
+// ════════════════════════════════════
+// DATA: 15 QUESTIONS
+// ════════════════════════════════════
+const questions = [
+  {
+    id:1, dim:"E_I", emoji:"🍜", location:"南宁 · 老友粉街",
+    text:"周末朋友约你去嗦粉，你的第一反应是？",
+    opts:[
+      {ab:"A", text:"直接在群里甩定位：谁不来谁亏，今天这碗粉我要吃成小型同学会。", val:"E"},
+      {ab:"B", text:"路上顺手和隔壁桌老表聊开，最后可能连老板都知道你是谁。", val:"E"},
+      {ab:"C", text:"想一个人安静嗦，最好坐角落，边吃边刷点奇怪但上头的冷门视频。", val:"I"},
+      {ab:"D", text:"更想外带回宿舍，加双倍酸笋，一个人边追悬疑边慢慢嗦，谁都别吵。", val:"I"}
+    ]
+  },
+  {
+    id:2, dim:"E_I", emoji:"🎉", location:"桂林 · 旅游旺季",
+    text:"桂林景区人挤人，排队两小时才能看一眼漓江，你觉得——",
+    opts:[
+      {ab:"A", text:"排队也能玩出花，前后左右聊一圈，没看景先交到半车朋友。", val:"E"},
+      {ab:"B", text:"人多才像过节，哪怕只是排队，你也想顺手拍个段子发朋友圈。", val:"E"},
+      {ab:"C", text:"我宁愿清晨五点单独来，安静看雾气从江面爬起来，那才值回票价。", val:"I"},
+      {ab:"D", text:"比起挤景区，更想躲去某条冷门小巷，对着旧墙和野猫发一下午呆。", val:"I"}
+    ]
+  },
+  {
+    id:3, dim:"S_N", emoji:"🌀", location:"柳州 · 螺蛳粉工厂",
+    text:"有人问你：螺蛳粉为什么这么臭还这么好吃？",
+    opts:[
+      {ab:"A", text:"你会开始讲发酵、挥发性气味分子和大脑奖赏机制，像在录科普栏目。", val:"N"},
+      {ab:"B", text:"你甚至能脑补一篇《臭味如何驯化人类味觉》的离谱论文标题。", val:"N"},
+      {ab:"C", text:"哪有那么复杂，先嗦一口，舌头自己会投票，解释不如实战。", val:"S"},
+      {ab:"D", text:"你会认真建议他闻着害怕就闭眼嗦，像第一次挑战黑暗料理圣杯。", val:"S"}
+    ]
+  },
+  {
+    id:4, dim:"S_N", emoji:"🏔", location:"靖西 · 蓝靛峡田埂",
+    text:"走在靖西的田埂上，你更多在想什么？",
+    opts:[
+      {ab:"A", text:"脑子自动跳去文明、迁徙和土地记忆，甚至想给这片风景写一段旁白。", val:"N"},
+      {ab:"B", text:"你会开始想：如果把这里拍成末日后重启文明的电影，镜头该怎么走。", val:"N"},
+      {ab:"C", text:"空气真好，脚下泥巴也真软，先决定等下吃几碗农家饭更实际。", val:"S"},
+      {ab:"D", text:"你想先摸摸稻穗、闻闻水汽，再研究路边有没有野果能直接啃。", val:"S"}
+    ]
+  },
+  {
+    id:5, dim:"S_N", emoji:"🌉", location:"崇左 · 德天瀑布",
+    text:"站在德天瀑布边，越南就在对面，你在想——",
+    opts:[
+      {ab:"A", text:"两岸明明只隔一条线，却像两套叙事系统，你会忍不住脑补边境故事。", val:"N"},
+      {ab:"B", text:"你甚至想象平行宇宙版本的自己正站在对岸，也在看同一片水。", val:"N"},
+      {ab:"C", text:"先拍照先录像，水这么大不记录太亏，等会还要去买边境咖啡。", val:"S"},
+      {ab:"D", text:"你很想试试站近一点感受水雾打脸，像被天然瀑布做了一次物理美容。", val:"S"}
+    ]
+  },
+  {
+    id:6, dim:"T_F", emoji:"🤝", location:"玉林 · 老表聚会",
+    text:"朋友跟你说他创业失败、欠了一屁股债，你第一反应是？",
+    opts:[
+      {ab:"A", text:"先拆问题：现金流断在哪、决策错在哪、还有没有翻盘窗口。", val:"T"},
+      {ab:"B", text:"你会直接打开备忘录，准备给他列一个止损清单，先活下来再谈理想。", val:"T"},
+      {ab:"C", text:"先把人从情绪泥潭里捞出来，陪他喝点、走走、把难受的先吐干净。", val:"F"},
+      {ab:"D", text:"你甚至想把他带去吃顿宵夜，哪怕先把灵魂缝一缝，明天再面对现实。", val:"F"}
+    ]
+  },
+  {
+    id:7, dim:"T_F", emoji:"🥬", location:"家里 · 亲戚做的酸嘢",
+    text:"亲戚做的酸嘢太咸了，你会——",
+    opts:[
+      {ab:"A", text:"礼貌但直接：今天盐有点猛，下次少半勺会更绝。", val:"T"},
+      {ab:"B", text:"你可能会顺手提出优化方案，甚至认真分析“酸咸比例失衡”的原因。", val:"T"},
+      {ab:"C", text:"先夸一句手艺，再默默多喝水，主打一个不让场面掉地上。", val:"F"},
+      {ab:"D", text:"你宁愿偷偷把它拌进白粥稀释，也不想让做的人当场心碎。", val:"F"}
+    ]
+  },
+  {
+    id:8, dim:"T_F", emoji:"🎵", location:"三月三 · 山歌对唱台",
+    text:"看到两个陌生人在山歌对唱台上当众表白，你的感受是？",
+    opts:[
+      {ab:"A", text:"第一反应是评估成功率：公开告白风险大、变量多、复盘价值高。", val:"T"},
+      {ab:"B", text:"你甚至会好奇这套流程能不能做成“民俗版恋爱策略模型”。", val:"T"},
+      {ab:"C", text:"情绪价值直接拉满，你已经在心里给他们自动配BGM和大结局。", val:"F"},
+      {ab:"D", text:"你可能边看边感动，边想：这也太像真人版恋综外加广西限定皮肤了。", val:"F"}
+    ]
+  },
+  {
+    id:9, dim:"J_P", emoji:"🚌", location:"柳州 · 出发前夜",
+    text:"明天去柳州吃螺蛳粉，你的状态是？",
+    opts:[
+      {ab:"A", text:"路线、时间、店铺、备选方案全排好，连停车点都在脑子里了。", val:"J"},
+      {ab:"B", text:"你甚至已经做了“爆辣版”和“猎奇限定版”两条嗦粉动线。", val:"J"},
+      {ab:"C", text:"先到再说，哪家排队短就吃哪家，惊喜本来就是计划外产物。", val:"P"},
+      {ab:"D", text:"你很可能半夜刷到一家地下室老店，第二天直接改线去冒险打卡。", val:"P"}
+    ]
+  },
+  {
+    id:10, dim:"J_P", emoji:"🎐", location:"南宁 · 三月三前夕",
+    text:"三月三假期快到了，你的状态是——",
+    opts:[
+      {ab:"A", text:"酒店车票路线一条龙搞定，群里只负责通知大家按表执行。", val:"J"},
+      {ab:"B", text:"你甚至做了雨天版、晴天版和临时放鸽子后的应急方案。", val:"J"},
+      {ab:"C", text:"昨天才想起放假，今天再看票，能走就走，走不了就在附近浪。", val:"P"},
+      {ab:"D", text:"你可能会在出门前十分钟突然决定去一个原本根本不在计划里的县城。", val:"P"}
+    ]
+  },
+  {
+    id:11, dim:"E_I", emoji:"🌿", location:"贺州 · 黄姚古镇",
+    text:"在黄姚古镇的石板路上遇到一位大爷在下棋，你会——",
+    opts:[
+      {ab:"A", text:"直接上前搭话，三分钟内从棋局聊到古镇旧事，再聊到他年轻时的江湖。", val:"E"},
+      {ab:"B", text:"你可能围观着围观着就被拉进棋局，还顺手认识旁边一圈看客。", val:"E"},
+      {ab:"C", text:"站远一点安静看，觉得这种不被打扰的氛围比聊天更珍贵。", val:"I"},
+      {ab:"D", text:"你会偷拍一张光影很绝的照片，回去配文“时间在这里走得比人慢”。", val:"I"}
+    ]
+  },
+  {
+    id:12, dim:"S_N", emoji:"🍊", location:"桂北 · 砂糖橘产地",
+    text:"有人说广西砂糖橘是天下第一橘，你的回应是？",
+    opts:[
+      {ab:"A", text:"你会从温差、土壤和风味层次讲到品种优势，像在做产地分析。", val:"N"},
+      {ab:"B", text:"你甚至能脑补出“砂糖橘如何征服全国水果摊”的商业纪录片。", val:"N"},
+      {ab:"C", text:"哪来那么多理论，先剥一个，甜就是硬道理，汁水会替你发言。", val:"S"},
+      {ab:"D", text:"你可能会直接当场连炫三个，用行动证明“天下第一橘”不是白叫的。", val:"S"}
+    ]
+  },
+  {
+    id:13, dim:"T_F", emoji:"🏠", location:"南宁 · 家族年夜饭",
+    text:"年夜饭上，长辈又在催婚，你会怎么处理？",
+    opts:[
+      {ab:"A", text:"直接摆事实讲进度：我有自己的时间表，这件事不用现在开会。", val:"T"},
+      {ab:"B", text:"你会把话题精准拐到房价、彩礼和就业趋势，让催婚现场自动熄火。", val:"T"},
+      {ab:"C", text:"先笑着接住，主打一个不给饭桌添堵，回头再慢慢消化。", val:"F"},
+      {ab:"D", text:"你可能会靠给长辈夹菜和转移话题维稳全场，牺牲自己保住气氛。", val:"F"}
+    ]
+  },
+  {
+    id:14, dim:"J_P", emoji:"🎲", location:"凭祥 · 边境市场",
+    text:"在凭祥边境市场，一个从没见过的东西让你心动，你会——",
+    opts:[
+      {ab:"A", text:"先查用途、价格、能不能带走，再决定值不值得为它开一次钱包。", val:"J"},
+      {ab:"B", text:"你甚至会先想：买它之后放哪、怎么拍照、会不会积灰。", val:"J"},
+      {ab:"C", text:"买！这种边境限定怪东西，一旦错过，以后想起会抓心挠肝。", val:"P"},
+      {ab:"D", text:"越是看不懂越想买，最好还是个朋友见了都要问“你到底图啥”的玩意。", val:"P"}
+    ]
+  },
+  {
+    id:15, dim:"S_N", emoji:"🌺", location:"广西 · 人生节点",
+    text:"你觉得「广西味道」最核心的东西是什么？",
+    opts:[
+      {ab:"A", text:"就是热、湿、酸、辣、粉味和夜市烟火，这些具体感官拼起来才叫广西。", val:"S"},
+      {ab:"B", text:"是夏天黏在皮肤上的风、嗦粉时额头冒汗、走两步就闻到酸笋那种实感。", val:"S"},
+      {ab:"C", text:"更像一种精神气质：松弛、顽强、嘴上淡定，心里其实很会热爱生活。", val:"N"},
+      {ab:"D", text:"像一种很玄的场域——哪怕人在外地，只要听见山歌或闻到粉味就会瞬间被召回。", val:"N"}
+    ]
+  }
+];
+
+// ════════════════════════════════════
+// DATA: 16 GUANGXI TYPES (MBTI keys)
+// ════════════════════════════════════
+const types = {
+  ENTP:{
+    name:"螺蛳粉辩手", eng:"The Noodle Debater",
+    emoji:"🍜",
+    tags:["能说会道","爱抬杠","金句王","语速极快","无敌好奇心"],
+    desc:"你是那种在街边螺蛳粉摊把哲学聊得天花乱坠的人。天生嘴皮子利，遇到任何观点都能找到反驳角度，但骨子里没有恶意——就是好辩。朋友说跟你聊天很过瘾，但也很累。你最喜欢把「臭豆腐和螺蛳粉哪个更臭」这种问题辩成人生命题，说到最后自己都信了。",
+    famous:"代表场景：把老友粉摊老板辩得无言以对，但照样每天来吃。",
+    best:{type:"INFJ", name:"漓江观音"},
+    work:{type:"INTJ", name:"灵渠设计师"},
+    clash:{type:"ESFJ", name:"桂圆阿姨"}
+  },
+  ENTJ:{
+    name:"刁民村长", eng:"The Iron Village Chief",
+    emoji:"👑",
+    tags:["强势主导","目标必达","指挥天才","全村都听我的","霸气外露"],
+    desc:"天生来管事的。不管是家族饭局排位置，还是公司项目拍板，没有你搞不定的场面。你说七点集合，没人敢七点零一到。你的人生哲学是：计划不如变化，但变化也得按我说的来。外表铁腕，内心其实惦记着全村人的死活。",
+    famous:"代表场景：把一盘散沙的团建活动变成阅兵式，还说「大家辛苦了」。",
+    best:{type:"INTP", name:"桂林隐士"},
+    work:{type:"ESTJ", name:"老友粉店主"},
+    clash:{type:"ISFP", name:"德天摄影师"}
+  },
+  ENFP:{
+    name:"壮族山歌王", eng:"The Zhuang Song Spirit",
+    emoji:"🎵",
+    tags:["热情满格","爱社交","创意无限","三月三灵魂","感染力强"],
+    desc:"你的人生像一场不停歇的山歌对唱。走到哪里都能把气氛点燃，朋友遍地，想法也遍地。你最擅长把别人一句话延伸成一首歌，再把这首歌唱成一段人生。计划这种东西不适合你——临时起意才能出奇迹，就像三月三的即兴对歌。",
+    famous:"代表场景：本来只是去买砂糖橘，结果跟摊主合唱了一首山歌后离开。",
+    best:{type:"INTJ", name:"灵渠设计师"},
+    work:{type:"ISTJ", name:"族谱守护者"},
+    clash:{type:"ISTJ", name:"族谱守护者"}
+  },
+  ENFJ:{
+    name:"侗族鼓楼寨主", eng:"The Dong Drum Tower Chief",
+    emoji:"🏡",
+    tags:["自带感召力","超强共情","天生领袖","为大家操心","大家的主心骨"],
+    desc:"你天生就是把大家凝聚在一起的人。就像侗族鼓楼是全村的核心，你是朋友圈里的情感锚点。遇到矛盾，你能让双方都觉得被理解；遇到困境，你能让大家看到希望。唯一的弱点是太为他人燃烧，容易忽视自己的感受。",
+    famous:"代表场景：宿舍闹矛盾，只有你能让两派人坐下来一起吃牛腩饭。",
+    best:{type:"ISFP", name:"德天摄影师"},
+    work:{type:"ENTP", name:"螺蛳粉辩手"},
+    clash:{type:"INTJ", name:"灵渠设计师"}
+  },
+  ESTP:{
+    name:"柳州街霸", eng:"The Liuzhou Street King",
+    emoji:"🏍",
+    tags:["胆大心细","活在当下","身手矫健","危机来了不慌","从不纸上谈兵"],
+    desc:"理论不如行动，说什么不如干什么。你是那种骑摩托车不用导航就能跑遍广西的主。哪里有热闹往哪里钻，哪里有危机你往前冲。别人还在开会讨论方案，你已经把事情办完回来等结果了。生活就是一场即兴的螺蛳粉——不问配方，嗦了就知道好不好。",
+    famous:"代表场景：朋友车在山里抛锚，你五分钟之内找到工具搞定，还顺便认识了一个老乡。",
+    best:{type:"ISFJ", name:"酸嘢师娘"},
+    work:{type:"ENTJ", name:"刁民村长"},
+    clash:{type:"INFJ", name:"漓江观音"}
+  },
+  ESTJ:{
+    name:"老友粉店主", eng:"The Noodle Shop Master",
+    emoji:"🍲",
+    tags:["重规矩","高效执行","传统卫士","凌晨四点开工","最靠谱的那个"],
+    desc:"你的人生哲学是：规矩大过天。早上几点开炉、汤要熬多少小时、料要放多少克，一点都不能差。别人觉得你死板，但老顾客觉得你是全南宁最值得信赖的。你不喜欢创新，因为祖传配方本来就是最好的答案。",
+    famous:"代表场景：徒弟偷懒少熬了半小时汤，被你当场闻出来。",
+    best:{type:"ISFP", name:"德天摄影师"},
+    work:{type:"ENTJ", name:"刁民村长"},
+    clash:{type:"ENFP", name:"壮族山歌王"}
+  },
+  ESFP:{
+    name:"南宁夜市主播", eng:"The Night Market Star",
+    emoji:"🎊",
+    tags:["超级外向","爱展示","活在当下","螺蛳粉吃播达人","流量密码"],
+    desc:"你天生是表演材料。不管是唱歌、整活还是吃播，有你在就有流量。你的人生信条是：开心就好，今天的烦恼留到明天，明天再说留后天。朋友跟你出去，永远不确定会发生什么，但可以确定一定不无聊。夜市就是你的主场，灯光、声音、人群都是你的配乐。",
+    famous:"代表场景：去买一串烤生蚝，回来时已经跟摊主合拍了三条视频。",
+    best:{type:"ISFJ", name:"酸嘢师娘"},
+    work:{type:"ISTJ", name:"族谱守护者"},
+    clash:{type:"INTJ", name:"灵渠设计师"}
+  },
+  ESFJ:{
+    name:"桂圆阿姨", eng:"The Longan Auntie",
+    emoji:"🍊",
+    tags:["体贴入微","超级热情","爱操心别人","饭没吃好不行","家族黏合剂"],
+    desc:"你就是那种来了就要帮你泡茶、问你吃了没、临走还要塞一袋砂糖橘的人。大家庭的节日靠你撑，你把爱都藏在了一日三餐和「多穿件衣服」里。偶尔会管太多，但大家知道你是真心的。离开广西的孩子最想念的，就是有你这样的人在。",
+    famous:"代表场景：明明自己感冒，还在厨房给所有人熬猪骨汤。",
+    best:{type:"ISFP", name:"德天摄影师"},
+    work:{type:"ESTJ", name:"老友粉店主"},
+    clash:{type:"ENTP", name:"螺蛳粉辩手"}
+  },
+  INTP:{
+    name:"桂林隐士", eng:"The Guilin Hermit",
+    emoji:"🏔",
+    tags:["沉迷思考","逻辑控","独行侠","象山没我深沉","宇宙级发散思维"],
+    desc:"你喜欢把一个问题想到宇宙尽头。朋友问你在想什么，你说「没什么」，其实脑子里已经转了八百个弯。山水是你最好的伴侣——漓江的安静给你足够的空间思考。你最烦别人打断你的沉思，最喜欢一个人把一件事的底层逻辑彻底搞清楚。",
+    famous:"代表场景：别人在讨论螺蛳粉好不好吃，你在思考「臭」这个感官体验的哲学本质。",
+    best:{type:"ENTJ", name:"刁民村长"},
+    work:{type:"INTJ", name:"灵渠设计师"},
+    clash:{type:"ESFJ", name:"桂圆阿姨"}
+  },
+  INTJ:{
+    name:"灵渠设计师", eng:"The Lingqu Strategist",
+    emoji:"⚙️",
+    tags:["超前布局","自成体系","不爱废话","一眼穿透本质","两千年前就赢了"],
+    desc:"你做任何事都有三步棋在前面等着。别人还在讨论方案A和B，你已经把C和D都算好了。就像当年设计灵渠的人——不是在凿沟，是在改变整个地理格局。朋友说你冷，你说你只是在思考。你不需要被理解，只需要结果证明你是对的。",
+    famous:"代表场景：组里最不爱说话的人，最后的方案永远是你的。",
+    best:{type:"ENFP", name:"壮族山歌王"},
+    work:{type:"INTP", name:"桂林隐士"},
+    clash:{type:"ENFJ", name:"侗族鼓楼寨主"}
+  },
+  INFP:{
+    name:"漓江诗人", eng:"The Lijiang Poet",
+    emoji:"🌊",
+    tags:["理想主义","情感细腻","独立内心","文艺老表","把山水写成诗"],
+    desc:"你的心里住着一条漓江，晴天水清，阴天也有意境。你对美有超乎常人的感受力，能在别人觉得普通的地方看到诗意。但现实有时让你委屈——那就写下来吧。你不是不行动，只是等待一个真正值得的理由。你相信世界本来可以更好，并且愿意为此付出代价。",
+    famous:"代表场景：在桂林的雨里写了一首诗，没发出去，但觉得写了就够了。",
+    best:{type:"ENFJ", name:"侗族鼓楼寨主"},
+    work:{type:"INFJ", name:"漓江观音"},
+    clash:{type:"ESTP", name:"柳州街霸"}
+  },
+  INFJ:{
+    name:"漓江观音", eng:"The Lijiang Oracle",
+    emoji:"🔮",
+    tags:["洞察人心","理想深邃","稀有罕见","沉默中的智者","预判一切"],
+    desc:"你能在别人开口之前就知道他要说什么，在别人崩溃之前感觉到裂缝。你的直觉准得可怕，但你很少把这些说出来，因为你知道时机未到。你是老表里最神秘的类型——既有深刻的理想主义，又有对人性的清醒认识。你不轻易打开内心，但一旦打开，就是终生的深情。",
+    famous:"代表场景：聚会散场，只有你注意到了角落里那个一直没怎么说话的人。",
+    best:{type:"ENTP", name:"螺蛳粉辩手"},
+    work:{type:"INFP", name:"漓江诗人"},
+    clash:{type:"ESTP", name:"柳州街霸"}
+  },
+  ISTP:{
+    name:"边境修车师傅", eng:"The Border Mechanic",
+    emoji:"🔧",
+    tags:["极度务实","动手能力满分","话少事多","坏了什么都会修","沉默是铠甲"],
+    desc:"不需要说很多话，结果会自己说明一切。别人还在讨论发动机为什么响，你已经把零件拆出来看完，装回去了。你不喜欢理论，只相信双手。朋友知道，有事找你，你不会说很多，但一定解决。你的沉默不是冷漠，是专注。",
+    famous:"代表场景：凌晨两点，朋友的车在山路上抛锚，你只问了一句「什么声音」，就知道怎么修。",
+    best:{type:"ESTJ", name:"老友粉店主"},
+    work:{type:"INTJ", name:"灵渠设计师"},
+    clash:{type:"ENFJ", name:"侗族鼓楼寨主"}
+  },
+  ISTJ:{
+    name:"壮族族谱守护者", eng:"The Genealogy Keeper",
+    emoji:"📜",
+    tags:["可靠如磐石","守规矩","历史责任感","祖宗的事不能忘","说一不二"],
+    desc:"族谱上的每一条记录你都背得清清楚楚。你相信规则和传统是有原因的，不是不能变，但得有依据、有交代。你的可靠是一种稀缺品质——你说的话算数，你做的承诺不会忘。别人觉得你古板，但危机来了第一个找的也是你。",
+    famous:"代表场景：全家唯一记得太公忌日的人，也是唯一提前备好祭品的人。",
+    best:{type:"ESFP", name:"南宁夜市主播"},
+    work:{type:"ESTJ", name:"老友粉店主"},
+    clash:{type:"ENTP", name:"螺蛳粉辩手"}
+  },
+  ISFP:{
+    name:"德天瀑布摄影师", eng:"The Detian Photographer",
+    emoji:"📷",
+    tags:["感受力极强","低调安静","热爱自然","不强迫别人懂你","用镜头说话"],
+    desc:"你的眼睛总能发现别人错过的美。一滴水珠在荷叶上滚动，边境线两侧不同颜色的土地，傍晚螺蛳粉摊的蒸汽——这些都是你的诗。不需要被看见，只需要能去看见。一个人背着相机在德天边境待一整天，你不觉得孤独，只觉得充实。",
+    famous:"代表场景：大家都在拍瀑布正面，只有你蹲下来拍了水边的一朵野花，那张照片最后传遍朋友圈。",
+    best:{type:"ESTJ", name:"老友粉店主"},
+    work:{type:"ENFJ", name:"侗族鼓楼寨主"},
+    clash:{type:"ENTJ", name:"刁民村长"}
+  },
+  ISFJ:{
+    name:"酸嘢师娘", eng:"The Pickled Vegetable Matriarch",
+    emoji:"🫙",
+    tags:["细心温柔","默默付出","记住每个人喜好","酸甜咸淡都拿捏到位","时间腌制的温柔"],
+    desc:"你把爱都藏在细节里——记得每个人爱吃多少辣、哪个老表不能吃芫荽、谁最近压力大要多夹一筷子肉。你不张扬，但你的温暖大家都感受得到。就像坛子里的酸嘢，时间越久，味道越醇。你的付出不需要被表扬，但被人记住会让你偷偷开心好几天。",
+    famous:"代表场景：你做的酸木瓜，每个来过家里的朋友都说要带走一罐。",
+    best:{type:"ESTP", name:"柳州街霸"},
+    work:{type:"ISTJ", name:"族谱守护者"},
+    clash:{type:"ENTP", name:"螺蛳粉辩手"}
+  }
+};
+
+// ════════════════════════════════════
+// STATE & STORAGE
+// ════════════════════════════════════
+let cur = 0;
+let answers = {};
+let selVal = null;
+let lastResultCode = null;
+let currentMode = "normal";
+let activeQuestions = [];
+
+const STORAGE_KEY = "guangxi_mbti_last_result_v2";
+const SITE_URL = window.location.href.split('#')[0];
+const loadingLines = [
+  ["正在捞取你的广西人格…","山歌在响，米粉在冒泡，马上出结果。"],
+  ["老表稍等两秒…","漓江小船已经把你的结果摇过来了。"],
+  ["正在翻译成广西味…","这次不是标准MBTI，是广西老表版本。"]
+];
+const regionTags = {
+  ENTP:"柳州嘴替 · 桂中热梗区",
+  ENTJ:"桂东主理人 · 办事雷厉风行",
+  ENFP:"桂南社牛 · 山歌开麦区",
+  ENFJ:"侗寨主心骨 · 团魂担当",
+  ESTP:"柳州街头派 · 热闹第一线",
+  ESTJ:"南宁稳场派 · 规则执行区",
+  ESFP:"夜市显眼包 · 南宁热闹挂",
+  ESFJ:"桂南烟火派 · 家族气氛组",
+  INTP:"桂北清醒脑 · 漓江发呆派",
+  INTJ:"灵渠布局流 · 桂北策略派",
+  INFP:"山水文艺挂 · 桂林情绪派",
+  INFJ:"静水深流派 · 桂中洞察流",
+  ISTP:"边境修理流 · 凭祥手艺派",
+  ISTJ:"传统守护派 · 桂西靠谱挂",
+  ISFP:"沿海感受派 · 北海慢生活",
+  ISFJ:"酸嘢温柔派 · 桂南照顾流"
+};
+const oneLiners = {
+  ENTP:"嘴比螺蛳粉还上头，聊着聊着就把全场聊服，属于老表界的“如何呢又能怎”嘴替。",
+  ENTJ:"全场都在等你拍板，你一开口就是主线任务，气场像在说“助我破鼎”。",
+  ENFP:"你不是社牛，你是广西山歌开屏器。",
+  ENFJ:"人群乱了你来稳，情绪崩了你来接。",
+  ESTP:"计划先放一边，现场爽才是第一原则。",
+  ESTJ:"你不是较真，你是把日子过成标准答案。",
+  ESFP:"只要你出现，空气里就自动响起BGM，走到哪都像自带“来财”体质。",
+  ESFJ:"你走到哪都像自带一桌热菜和一句“吃了没”。",
+  INTP:"表面没说话，实际脑子已经绕地球八圈。",
+  INTJ:"别人还在想能不能做，你已经想完怎么赢。",
+  INFP:"你不是矫情，是把山水和情绪都看得太真，属于广西版情绪价值收藏家。",
+  INFJ:"别人还没开口，你已经听见了情绪的回音。",
+  ISTP:"你不爱废话，但一出手问题就没了。",
+  ISTJ:"你像一本老族谱，看着安静，其实特别可靠。",
+  ISFP:"你不是慢，你是在认真感受每一阵风。",
+  ISFJ:"你的温柔像酸嘢，越回味越上头，主打一个细水长流地把情绪价值给足。"
+};
+
+const whyByDim = {
+  EI: { E:"你有外向热场能力，遇到人和局就容易进入状态。", I:"你更习惯把能量留给自己，一个人待着更容易回满血。 "},
+  SN: { S:"你对具体体验更敏感，吃到嘴里、看到眼前的最真。", N:"你会自动往更深一层想，擅长从细节联想到意味。 "},
+  TF: { T:"你下意识先分析逻辑和解决方案，理性开路。", F:"你更先顾及情绪和关系，讲究体感和分寸。 "},
+  JP: { J:"你偏向有安排、有把握，心里有谱才舒服。", P:"你更爱留弹性和即兴感，随缘反而更有生命力。 "}
+};
+
+// ════════════════════════════════════
+// LOGIC
+// ════════════════════════════════════
+function calcType(ans) {
+  const s = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+  questions.forEach(q => { if(ans[q.id]) s[ans[q.id]]++; });
+  return (s.E>=s.I?'E':'I')+(s.S>=s.N?'S':'N')+(s.T>=s.F?'T':'F')+(s.J>=s.P?'J':'P');
+}
+
+function getDim(ans, a, b) {
+  let ac=0, bc=0;
+  questions.forEach(q => {
+    if(!ans[q.id]) return;
+    if(ans[q.id]===a) ac++;
+    else if(ans[q.id]===b) bc++;
+  });
+  const total = ac + bc || 1;
+  return { a:ac, b:bc, pctA: Math.round(ac/total*100), winner: ac>=bc ? a : b };
+}
+
+function getQuestionSet() {
+  if (currentMode === "fast") {
+    return questions.filter((_, idx) => idx % 3 !== 1).slice(0, 10);
+  }
+  return questions.slice();
+}
+
+function setMode(mode, softRestart=false) {
+  currentMode = mode;
+  const normal = document.getElementById('mode-normal');
+  const fast = document.getElementById('mode-fast');
+  if (normal && fast) {
+    normal.classList.toggle('active', mode === 'normal');
+    fast.classList.toggle('active', mode === 'fast');
+  }
+  activeQuestions = getQuestionSet();
+  if (softRestart) restart(true);
+}
+
+function getCurrentQuestion() {
+  return activeQuestions[cur];
+}
+
+function getUserName() {
+  const el = document.getElementById('user-name');
+  return el && el.value.trim() ? el.value.trim() : '这位老表';
+}
+
+function getRegionTag(code) {
+  return regionTags[code] || "广西随机老表";
+}
+
+function showLoading() {
+  const box = document.getElementById('loading-mask');
+  const title = document.getElementById('loading-title');
+  const sub = document.getElementById('loading-sub');
+  const [t, s] = loadingLines[Math.floor(Math.random()*loadingLines.length)];
+  title.textContent = t;
+  sub.textContent = s;
+  box.style.display = 'flex';
+}
+
+function hideLoading() {
+  document.getElementById('loading-mask').style.display = 'none';
+}
+
+function skipQuestion() {
+  const q = getCurrentQuestion();
+  if (!q) return;
+  if (!answers[q.id]) {
+    const randomVal = q.opts[Math.floor(Math.random()*q.opts.length)].val;
+    answers[q.id] = randomVal;
+  }
+  selVal = answers[q.id];
+  next();
+}
+
+function getWhyText(code) {
+  const parts = [];
+  parts.push(whyByDim.EI[code[0]]);
+  parts.push(whyByDim.SN[code[1]]);
+  parts.push(whyByDim.TF[code[2]]);
+  parts.push(whyByDim.JP[code[3]]);
+  return parts;
+}
+
+function getRankData(code) {
+  const region = getRegionTag(code);
+  const group = region.includes('南宁') ? [
+    ['ESFP','南宁夜市主播',88],['ESFJ','桂圆阿姨',74],['ESTJ','老友粉店主',69]
+  ] : region.includes('桂北') ? [
+    ['INTP','桂林隐士',86],['INFP','漓江诗人',72],['INTJ','灵渠设计师',64]
+  ] : region.includes('沿海') ? [
+    ['ISFP','德天瀑布摄影师',80],['ENFP','壮族山歌王',71],['ISFJ','酸嘢师娘',63]
+  ] : [
+    ['ENFP','壮族山歌王',82],['INTP','桂林隐士',77],['ESFP','南宁夜市主播',66]
+  ];
+  return group;
+}
+
+function saveLastResult(code) {
+  const info = types[code];
+  if (!info) return;
+  const payload = {
+    code,
+    name: info.name,
+    emoji: info.emoji,
+    mode: currentMode,
+    nickname: getUserName(),
+    time: new Date().toLocaleString("zh-CN")
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+}
+
+function readLastResult() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function showNotice(text) {
+  const el = document.getElementById("notice");
+  el.textContent = text;
+  clearTimeout(showNotice._t);
+  showNotice._t = setTimeout(() => {
+    el.textContent = "";
+  }, 2200);
+}
+
+// ════════════════════════════════════
+// RENDER
+// ════════════════════════════════════
+function startQuiz() {
+  activeQuestions = getQuestionSet();
+  cur = 0;
+  answers = {};
+  selVal = null;
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  showLoading();
+  setTimeout(() => {
+    hideLoading();
+    renderQ();
+  }, 850);
+}
+
+function renderQ() {
+  const q = getCurrentQuestion();
+  selVal = answers[q.id] || null;
+  const pct = Math.round((cur / activeQuestions.length) * 100);
+
+  document.getElementById('q-label').textContent = `第 ${cur+1} 题，共 ${activeQuestions.length} 题`;
+  document.getElementById('p-fill').style.width = pct + '%';
+  document.getElementById('p-pct').textContent = pct + '%';
+  document.getElementById('btn-back').style.display = cur === 0 ? 'none' : '';
+  document.getElementById('btn-next').disabled = !selVal;
+  document.getElementById('btn-next').textContent = cur === activeQuestions.length - 1 ? '查看结果 ✦' : '下一题 →';
+
+  const dimMap = {E_I:'外向 / 内向', S_N:'感知 / 直觉', T_F:'思维 / 情感', J_P:'判断 / 知觉'};
+
+  document.getElementById('q-card').innerHTML = `
+    <div class="dim-badge">
+      <div class="dim-dot"></div>
+      ${dimMap[q.dim] || q.dim}
+    </div>
+    <div class="q-scene">
+      <div class="q-emoji-bg">${q.emoji}</div>
+      <div class="q-meta">
+        <div class="q-num-label">情景 ${cur+1} / ${activeQuestions.length}</div>
+        <div class="q-location">📍 ${q.location}</div>
+      </div>
+    </div>
+    <div class="q-text">${q.text}</div>
+    <div class="options">
+      ${q.opts.map(o => `
+        <button class="opt${selVal===o.val ? ' selected' : ''}" onclick="choose('${o.val}', this)">
+          <div class="opt-inner">
+            <span class="opt-ab">${o.ab}</span>${o.text}
+          </div>
+        </button>
+      `).join('')}
+    </div>
+    <div class="question-tip">提示：四个选项故意拉开了差异，别选“看起来最好”的，选最像你发疯或发呆时会做的。</div>
+  `;
+}
+
+function choose(val, el) {
+  selVal = val;
+  answers[getCurrentQuestion().id] = val;
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function next() {
+  if (!selVal) return;
+  cur++;
+  if (cur >= activeQuestions.length) {
+    showLoading();
+    setTimeout(() => { hideLoading(); showResult(); }, 900);
+    return;
+  }
+  selVal = answers[getCurrentQuestion().id] || null;
+  renderQ();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function prev() {
+  if (cur > 0) {
+    cur--;
+    selVal = answers[getCurrentQuestion().id] || null;
+    renderQ();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+}
+
+function renderHistory() {
+  const data = readLastResult();
+  const wrap = document.getElementById("history-section");
+  if (!data) {
+    wrap.innerHTML = `
+      <div class="history-title">最近一次结果 · 老表热梗回放</div>
+      <div class="history-content history-empty">你还没有保存过本地结果。</div>
+    `;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="history-title">最近一次结果 · 老表热梗回放</div>
+    <div class="history-content">
+      <div>上次测出来的是：<strong>${data.emoji} ${data.code} · ${data.name}</strong></div>
+      <div style="color:var(--muted);font-size:13px;margin-top:6px;">${data.nickname || '这位老表'} · ${data.mode === 'fast' ? '快速模式' : '标准模式'} · ${data.time}</div>
+    </div>
+  `;
+}
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+
+  const code = calcType(answers);
+  lastResultCode = code;
+  const info = types[code] || types['INFP'];
+  saveLastResult(code);
+
+  const nickname = getUserName();
+  const regionTag = getRegionTag(code);
+  const oneLine = oneLiners[code] || '广西味儿浓度过高，建议立刻发给朋友看，顺手说一句如何呢又能怎。';
+
+  document.getElementById('result-hero').innerHTML = `
+    <div class="result-kicker">你是哪款广西老表 · ${currentMode === 'fast' ? '快速模式' : '标准模式'}</div>
+    <span class="result-emoji-big">${info.emoji}</span>
+    <div class="result-type-code">${code}</div>
+    <div class="result-name">${nickname} · ${info.name}</div>
+    <div class="result-eng">${info.eng}</div>
+    <div class="result-region">
+      <span class="region-pill">${regionTag}</span>
+      <span class="one-line-pill">${oneLine}</span>
+    </div>
+    <div class="result-tags">${info.tags.map(t => `<span class="rtag">${t}</span>`).join('')}</div>
+    <div class="result-desc">${info.desc}</div>
+    <div class="result-famous">${info.famous}</div>
+  `;
+
+  const dims = [
+    {a:'E', b:'I', la:'外向 E', lb:'内向 I'},
+    {a:'S', b:'N', la:'感知 S', lb:'直觉 N'},
+    {a:'T', b:'F', la:'思维 T', lb:'情感 F'},
+    {a:'J', b:'P', la:'判断 J', lb:'知觉 P'}
+  ];
+
+  document.getElementById('dims-section').innerHTML = `
+    <div class="dims-title">人格维度分析</div>
+    ${dims.map(d => {
+      const sc = getDim(answers, d.a, d.b);
+      const pct = sc.winner === d.a ? sc.pctA : 100 - sc.pctA;
+      const winLabel = sc.winner === d.a ? d.la : d.lb;
+      const loseLabel = sc.winner === d.a ? d.lb : d.la;
+      return `
+        <div class="dim-row">
+          <div class="dim-labels">
+            <span class="dim-winner">${winLabel} ${pct}%</span>
+            <span>${loseLabel} ${100-pct}%</span>
+          </div>
+          <div class="dim-track"><div class="dim-fill" style="width:0%" data-w="${pct}%"></div></div>
+        </div>
+      `;
+    }).join('')}
+  `;
+
+  setTimeout(() => {
+    document.querySelectorAll('.dim-fill').forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  }, 100);
+
+  document.getElementById('compat-section').innerHTML = `
+    <div class="compat-title">老表配对指南</div>
+    <div class="compat-grid">
+      <div class="compat-card best">
+        <div class="compat-label">💚 你和谁最配</div>
+        <div class="compat-val">${info.best.type}</div>
+        <div class="compat-type">${info.best.name}</div>
+      </div>
+      <div class="compat-card work">
+        <div class="compat-label">🤝 最稳搭子</div>
+        <div class="compat-val">${info.work.type}</div>
+        <div class="compat-type">${info.work.name}</div>
+      </div>
+      <div class="compat-card clash" style="grid-column:1/-1">
+        <div class="compat-label">🌶 你和谁最吵</div>
+        <div class="compat-val">${info.clash.type} · ${info.clash.name}</div>
+        <div class="compat-type" style="font-size:12px;color:var(--muted);margin-top:4px">不是坏事，碰撞才有火花嘛</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('reason-section').innerHTML = `
+    <div class="dims-title">为什么你会是这款老表</div>
+    <div class="reason-list">
+      ${getWhyText(code).map(item => `<div class="reason-item">${item}</div>`).join('')}
+    </div>
+  `;
+
+  document.getElementById('rank-section').innerHTML = `
+    <div class="dims-title">热门人格参考 · 哪个最像你的互联网嘴替</div>
+    <div class="rank-grid">
+      ${getRankData(code).map((item, idx) => `
+        <div class="rank-item">
+          <div class="rank-left">
+            <div class="rank-no">${idx + 1}</div>
+            <div class="rank-meta">${item[0]} · ${item[1]}</div>
+          </div>
+          <div class="rank-bar"><span style="width:${item[2]}%"></span></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  renderHistory();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function restart(reshuffleMode=false) {
+  cur = 0;
+  answers = {};
+  selVal = null;
+  lastResultCode = null;
+  if (reshuffleMode && currentMode === 'normal') currentMode = 'fast';
+  else if (reshuffleMode && currentMode === 'fast') currentMode = 'normal';
+  setMode(currentMode);
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQ();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ════════════════════════════════════
+// COPY RESULT
+// ════════════════════════════════════
+function getResultText() {
+  const code = lastResultCode || calcType(answers);
+  const info = types[code] || types["INFP"];
+  const nickname = getUserName();
+  return [
+    `${nickname}测出来的广西人格是：${code} · ${info.name} ${info.emoji}`,
+    `地域标签：${getRegionTag(code)}`,
+    `一句话：${oneLiners[code] || ''}`,
+    `人格标签：${info.tags.join(" / ")}`,
+    `简介：${info.desc}`,
+    `代表场景：${info.famous.replace(/^代表场景：/, "")}`,
+    `热梗总结：如何呢又能怎，先敬自己一杯，再去嗦粉。`,
+    `来测你的：${SITE_URL}`,
+    `—— 来自 桂MBTI｜广西人格测试`
+  ].join("\n");
+}
+
+async function copyResultText() {
+  const text = getResultText();
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    showNotice("结果文案已复制");
+  } catch (e) {
+    showNotice("复制失败，请手动复制");
+  }
+}
+
+async function shareNative() {
+  const text = getResultText();
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: '桂MBTI｜广西人格测试', text, url: SITE_URL });
+      showNotice('已调起系统分享');
+    } else {
+      await copyResultText();
+    }
+  } catch (e) {
+    showNotice('你取消了分享');
+  }
+}
+
+// ════════════════════════════════════
+// SHARE IMAGE EXPORT (NO EXTERNAL LIB)
+// uses SVG foreignObject -> Blob -> Canvas -> PNG
+// ════════════════════════════════════
+function escapeXml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function buildShareCardHTML(info, code) {
+  const nickname = getUserName();
+  return `
+    <div xmlns="http://www.w3.org/1999/xhtml" style="
+      width:720px;
+      background:linear-gradient(180deg,#fff9f5 0%,#ffffff 100%);
+      color:#1A1208;
+      border:1px solid rgba(200,75,46,0.15);
+      padding:36px;
+      border-radius:24px;
+      font-family:Arial,'PingFang SC','Microsoft YaHei',sans-serif;
+      box-sizing:border-box;
+    ">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-family:Georgia,'Songti SC','STSong',serif;font-size:48px;color:#C84B2E;letter-spacing:4px;line-height:1;">桂 MBTI</div>
+        <div style="font-size:18px;color:#8A7A68;margin-top:8px;">广西人格测试结果</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(90,60,30,0.12);border-radius:18px;padding:26px;">
+        <div style="font-size:52px;text-align:center;margin-bottom:10px;">${escapeXml(info.emoji)}</div>
+        <div style="font-family:Georgia,'Songti SC','STSong',serif;text-align:center;font-size:42px;color:#C84B2E;letter-spacing:4px;margin-bottom:8px;">${escapeXml(code)}</div>
+        <div style="text-align:center;font-family:Georgia,'Songti SC','STSong',serif;font-size:26px;margin-bottom:6px;">${escapeXml(nickname)} · ${escapeXml(info.name)}</div>
+        <div style="text-align:center;font-size:14px;color:#2F7D5C;margin-bottom:14px;">${escapeXml(getRegionTag(code))}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;">
+          ${info.tags.map(tag => `
+            <span style="padding:4px 10px;border-radius:20px;background:#F5E8E3;color:#C84B2E;font-size:13px;border:1px solid rgba(200,75,46,0.2);">${escapeXml(tag)}</span>
+          `).join("")}
+        </div>
+        <div style="font-size:16px;line-height:1.9;color:#3D2E1A;background:#FBF7F0;border-radius:12px;padding:16px;">
+          ${escapeXml(info.desc)}
+        </div>
+      </div>
+      <div style="margin-top:18px;text-align:center;font-size:15px;color:#8A7A68;">
+        我是哪款老表？快来测你的广西人格
+      </div>
+      <div style="margin-top:10px;text-align:center;font-size:12px;color:#8A7A68;word-break:break-all;">
+        访问地址：${escapeXml(SITE_URL)}
+      </div>
+    </div>
+  `;
+}
+
+async function exportShareImage() {
+  try {
+    const code = lastResultCode || calcType(answers);
+    const info = types[code] || types["INFP"];
+    const cardHTML = buildShareCardHTML(info, code);
+
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="720" height="1040">
+        <foreignObject width="100%" height="100%">
+          ${cardHTML}
+        </foreignObject>
+      </svg>
+    `;
+
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 720;
+      canvas.height = 1040;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      URL.revokeObjectURL(url);
+
+      canvas.toBlob(function(pngBlob) {
+        if (!pngBlob) {
+          showNotice("导出失败");
+          return;
+        }
+        const a = document.createElement("a");
+        const pngUrl = URL.createObjectURL(pngBlob);
+        a.href = pngUrl;
+        a.download = `桂MBTI-${code}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+        showNotice("结果图片已导出");
+      }, "image/png");
+    };
+
+    img.onerror = function() {
+      URL.revokeObjectURL(url);
+      showNotice("导出失败，当前浏览器不支持此方式");
+    };
+
+    img.src = url;
+  } catch (e) {
+    showNotice("导出失败");
+  }
+}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+(function init() {
+  setMode('normal');
+  renderHistoryPreviewOnSplash();
+})();
+
+function renderHistoryPreviewOnSplash() {
+  const data = readLastResult();
+  if (!data) return;
+
+  const footer = document.querySelector(".splash-footer");
+  footer.innerHTML = `
+    上次结果：<strong>${data.emoji} ${data.code} · ${data.name}</strong><br>
+    <span style="font-size:11px;">测试结果仅供娱乐，老表莫太认真 😄</span>
+  `;
+}
+</script>
+</body>
+</html>
